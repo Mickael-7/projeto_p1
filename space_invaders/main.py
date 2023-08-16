@@ -2,13 +2,15 @@ import pygame, sys
 from player import Player
 class Game:
     def __init__(self):
-        player_sprite = Player((largura/2, altura),largura,5)
+        player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
     def run(self):
         self.player.update()
 
+        self.player.sprite.lasers.draw(tela)
         self.player.draw(tela)
+
 
 if __name__ == '__main__':
     pygame.init()
