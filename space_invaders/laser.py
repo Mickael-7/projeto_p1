@@ -1,7 +1,8 @@
 import pygame
 
+
 class Laser(pygame.sprite.Sprite):
-    def __init__(self,pos,speed,altura):
+    def __init__(self, pos, speed, altura):
         super().__init__()
         self.image = pygame.Surface((4, 16))
         self.image.fill('white')
@@ -10,8 +11,10 @@ class Laser(pygame.sprite.Sprite):
         self.limite_y = altura
 
     def destruir(self):
-        pass
+        if self.rect.y <= -50 or self.rect.y >= self.limite_y + 50:
+            self.kill()
 
     def update(self):
         self.rect.y += self.speed
+        self.destruir()
 
