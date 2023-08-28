@@ -1,13 +1,21 @@
 import pygame
 import sys
-from player import Player
 import objeto
+from player import Player
+from alien import Aliens
+from random import randint
+
 
 
 class Game:
     def __init__(self):
         player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
+
+        self.aliens = pygame.sprite.Group()
+        self.alien_setup(rows=6, cols=8)
+        self.alien_direcao = 1
+
 
         self.shape = objeto.shape
         self.bloco_tam = 6
@@ -29,13 +37,42 @@ class Game:
         for offset_x in offset:
             self.criar_obstaculos(x_inicio, y_inicio, offset_x)
 
+    def alien_setup(self, rows, cols, x_distancia=60, y_distancia=48, x_offset=70, y_offset=100):
+        for row_index, row in enumerate(range(rows)):
+            for col_index, col in enumerate(range(cols)):
+                x = col_index * x_distancia + x_offset
+                y = row_index * y_distancia + y_offset
+
+                if row_index == 0:
+                    alien_sprite = Aliens('red', x, y)
+                elif 1 <= row_index <= 2:
+                    alien_sprite = Aliens('blue', x, y)
+                else:
+                    alien_sprite = Aliens('white', x, y)
+                self.aliens.add(alien_sprite)
+
+    def colisao(self):
+        if self.player.sprite.lasers:
+            for laser in self.player.sprite.lasers:
+                if pygame.sprite.spritecollide(laser, self.blocos, True):
+                    laser.kill()
+
+        if self.player.sprite.lasers:
+            for laser in self.player.sprite.lasers:
+                if pygame.sprite.spritecollide(laser, self.aliens, True):
+                    laser.kill()
+                    
+
     def run(self):
         self.player.update()
-
         self.player.sprite.lasers.draw(tela)
         self.player.draw(tela)
 
+        self.aliens.draw(tela)
+
         self.blocos.draw(tela)
+
+        self.colisao()
 
 
 if __name__ == '__main__':
@@ -45,15 +82,33 @@ if __name__ == '__main__':
     tela = pygame.display.set_mode((largura, altura))
     fps = pygame.time.Clock()
     pygame.display.set_caption('space invaders')
+    pygame_icon = pygame.image.load('sprite/jogador2.png')
+    pygame.display.set_icon(pygame_icon)
     game = Game()
+    bg = pygame.image.load('sprite/background.png').convert_alpha()
+    bg = pygame.transform.scale(bg, (largura, altura))
+    pontos = 0
+    fonte = pygame.font.SysFont('arial', 15, True, True)
 
     while True:
+        mensagem = f'PONTOS: {pontos}'
+        texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        tela.fill((30, 30, 30))
+        tela.blit(bg, (0, 0))
+
+        real_y = altura % bg.get_rect().height
+
+        tela.blit(bg, (0, real_y - bg.get_rect().height))
+        tela.blit(texto_formatado, (15, 20))
+        if real_y < 650:
+            tela.blit(bg, (0, real_y))
+        altura += 1
+
         game.run()
 
         pygame.display.flip()
