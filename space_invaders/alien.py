@@ -6,4 +6,7 @@ class Aliens(pygame.sprite.Sprite):
         super().__init__()
         imagem = 'sprite/'+color+'.png'
         self.image = pygame.image.load(imagem).convert_alpha()
-        self.rect = self.image.get_rect(topleft=(x,y))
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def update(self, direcao):
+        self.rect.x += direcao

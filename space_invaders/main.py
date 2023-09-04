@@ -3,19 +3,22 @@ import sys
 import objeto
 from player import Player
 from alien import Aliens
-from random import randint
-
+from random import choice
+from laser import Laser
 
 
 class Game:
     def __init__(self):
         player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
+        self.kill = 0
 
         self.aliens = pygame.sprite.Group()
+        self.alien_lasers = pygame.sprite.Group()
         self.alien_setup(rows=6, cols=8)
         self.alien_direcao = 1
 
+        self.hit = 0
 
         self.shape = objeto.shape
         self.bloco_tam = 6
@@ -44,12 +47,34 @@ class Game:
                 y = row_index * y_distancia + y_offset
 
                 if row_index == 0:
-                    alien_sprite = Aliens('red', x, y)
+                    alien_sprite = Aliens('redT', x, y)
                 elif 1 <= row_index <= 2:
-                    alien_sprite = Aliens('blue', x, y)
+                    alien_sprite = Aliens('blueT', x, y)
                 else:
-                    alien_sprite = Aliens('white', x, y)
+                    alien_sprite = Aliens('whiteT', x, y)
                 self.aliens.add(alien_sprite)
+
+    def alien_posicao_check(self):
+        all_aliens = self.aliens.sprites()
+        for aliens in all_aliens:
+            if aliens.rect.right >= largura:
+                self.alien_direcao = -1
+                self.alien_baixo(2)
+            elif aliens.rect.left <= 0:
+                self.alien_direcao = 1
+                self.alien_baixo(2)
+
+    def alien_baixo(self, distancia):
+        if self.aliens:
+            for aliens in self.aliens.sprites():
+                aliens.rect.y += distancia
+
+    def alien_shoot(self):
+        if self.aliens.sprites():
+            random_alien = choice(self.aliens.sprites())
+            laser_sprite = Laser(random_alien.rect.center,6,altura)
+            self.alien_lasers.add(laser_sprite)
+
 
     def colisao(self):
         if self.player.sprite.lasers:
@@ -60,8 +85,16 @@ class Game:
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
                 if pygame.sprite.spritecollide(laser, self.aliens, True):
+                    self.hit += 1
                     laser.kill()
-                    
+                    if self.hit == 2:
+                        laser.kill()
+                        self.kill += 1
+        if self.aliens:
+            for aliens in self.aliens:
+                pygame.sprite.spritecollide(aliens, self.blocos, True)
+
+
 
     def run(self):
         self.player.update()
@@ -69,7 +102,10 @@ class Game:
         self.player.draw(tela)
 
         self.aliens.draw(tela)
-
+        self.alien_posicao_check()
+        self.aliens.update(self.alien_direcao)
+        self.alien_lasers.update()
+        self.alien_lasers.draw(tela)
         self.blocos.draw(tela)
 
         self.colisao()
@@ -87,11 +123,10 @@ if __name__ == '__main__':
     game = Game()
     bg = pygame.image.load('sprite/background.png').convert_alpha()
     bg = pygame.transform.scale(bg, (largura, altura))
-    pontos = 0
     fonte = pygame.font.SysFont('arial', 15, True, True)
 
     while True:
-        mensagem = f'PONTOS: {pontos}'
+        mensagem = f'PONTOS: {game.kill}'
         texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
 
         for event in pygame.event.get():
