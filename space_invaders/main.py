@@ -72,9 +72,8 @@ class Game:
     def alien_shoot(self):
         if self.aliens.sprites():
             random_alien = choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center,6,altura)
+            laser_sprite = Laser(random_alien.rect.center, 6, altura)
             self.alien_lasers.add(laser_sprite)
-
 
     def colisao(self):
         if self.player.sprite.lasers:
@@ -85,16 +84,17 @@ class Game:
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
                 if pygame.sprite.spritecollide(laser, self.aliens, True):
-                    self.hit += 1
                     laser.kill()
-                    if self.hit == 2:
-                        laser.kill()
-                        self.kill += 1
+                    self.kill += 1
+
         if self.aliens:
             for aliens in self.aliens:
                 pygame.sprite.spritecollide(aliens, self.blocos, True)
 
-
+        if self.alien_lasers:
+            for laser in self.alien_lasers:
+                if pygame.sprite.spritecollide(laser, self.blocos, True):
+                    laser.kill()
 
     def run(self):
         self.player.update()
@@ -125,6 +125,9 @@ if __name__ == '__main__':
     bg = pygame.transform.scale(bg, (largura, altura))
     fonte = pygame.font.SysFont('arial', 15, True, True)
 
+    alienL = pygame.USEREVENT + 1
+    pygame.time.set_timer(alienL, 700)
+
     while True:
         mensagem = f'PONTOS: {game.kill}'
         texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
@@ -133,6 +136,8 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == alienL:
+                game.alien_shoot()
 
         tela.blit(bg, (0, 0))
 
