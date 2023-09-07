@@ -12,6 +12,7 @@ class Game:
         player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
         self.kill = 0
+        self.lives = 5
 
         self.aliens = pygame.sprite.Group()
         self.alien_lasers = pygame.sprite.Group()
@@ -96,6 +97,14 @@ class Game:
                 if pygame.sprite.spritecollide(laser, self.blocos, True):
                     laser.kill()
 
+                if pygame.sprite.spritecollide(laser, self.player, False):
+                    laser.kill()
+                    self.lives -= 1
+                    if self.lives <= 0:
+                        pygame.quit()
+                        sys.exit()
+
+
     def run(self):
         self.player.update()
         self.player.sprite.lasers.draw(tela)
@@ -124,13 +133,16 @@ if __name__ == '__main__':
     bg = pygame.image.load('sprite/background.png').convert_alpha()
     bg = pygame.transform.scale(bg, (largura, altura))
     fonte = pygame.font.SysFont('arial', 15, True, True)
+    fonte2 = pygame.font.SysFont('arial', 15, True, True)
 
     alienL = pygame.USEREVENT + 1
     pygame.time.set_timer(alienL, 700)
 
     while True:
         mensagem = f'PONTOS: {game.kill}'
+        mensagem2 = f'VIDAS: {game.lives}'
         texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
+        texto_formatado2 = fonte2.render(mensagem2, True, (255, 255, 255))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -145,6 +157,7 @@ if __name__ == '__main__':
 
         tela.blit(bg, (0, real_y - bg.get_rect().height))
         tela.blit(texto_formatado, (15, 20))
+        tela.blit(texto_formatado2, (500,20))
         if real_y < 650:
             tela.blit(bg, (0, real_y))
         altura += 1
