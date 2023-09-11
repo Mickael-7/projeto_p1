@@ -2,10 +2,10 @@ import pygame
 
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self, pos, speed, altura):
+    def __init__(self, pos, speed, altura,cor):
         super().__init__()
         self.image = pygame.Surface((4, 16))
-        self.image.fill('white')
+        self.image.fill(cor)
         self.rect = self.image.get_rect(center=pos)
         self.speed = speed
         self.limite_y = altura

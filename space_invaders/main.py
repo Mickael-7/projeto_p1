@@ -11,6 +11,9 @@ class Game:
     def __init__(self):
         player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
+        self.som_morte = pygame.mixer.Sound('invaderkilled_.mp3')
+        self.som_vida_player = pygame.mixer.Sound('explosion.wav')
+        self.musica_fundo = pygame.mixer_music.load('Battle Special.mp3')
         self.kill = 0
         self.lives = 5
 
@@ -73,7 +76,7 @@ class Game:
     def alien_shoot(self):
         if self.aliens.sprites():
             random_alien = choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center, 6, altura)
+            laser_sprite = Laser(random_alien.rect.center, 6, altura,'red')
             self.alien_lasers.add(laser_sprite)
 
     def colisao(self):
@@ -87,10 +90,14 @@ class Game:
                 if pygame.sprite.spritecollide(laser, self.aliens, True):
                     laser.kill()
                     self.kill += 1
+                    self.som_morte.play()
 
         if self.aliens:
             for aliens in self.aliens:
                 pygame.sprite.spritecollide(aliens, self.blocos, True)
+                if pygame.sprite.spritecollide(aliens, self.player, True):
+                    self.lives = 0
+                    self.som_morte.play()
 
         if self.alien_lasers:
             for laser in self.alien_lasers:
@@ -100,10 +107,17 @@ class Game:
                 if pygame.sprite.spritecollide(laser, self.player, False):
                     laser.kill()
                     self.lives -= 1
+                    self.som_vida_player.play()
                     if self.lives <= 0:
                         pygame.quit()
                         sys.exit()
 
+    def vitoria(self):
+        if not self.aliens.sprites():
+            info = pygame.font.SysFont('arial', 15, True, True)
+            mensagemV = 'YOU WIN'
+            textoV = info.render(mensagemV, True, (255, 255, 255))
+            tela.blit(textoV, (250, 300))
 
     def run(self):
         self.player.update()
@@ -116,6 +130,7 @@ class Game:
         self.alien_lasers.update()
         self.alien_lasers.draw(tela)
         self.blocos.draw(tela)
+        self.vitoria()
 
         self.colisao()
 
@@ -134,6 +149,7 @@ if __name__ == '__main__':
     bg = pygame.transform.scale(bg, (largura, altura))
     fonte = pygame.font.SysFont('arial', 15, True, True)
     fonte2 = pygame.font.SysFont('arial', 15, True, True)
+    pygame.mixer.music.play(-1)
 
     alienL = pygame.USEREVENT + 1
     pygame.time.set_timer(alienL, 700)
