@@ -2,7 +2,7 @@ import pygame
 
 
 class Aliens(pygame.sprite.Sprite):
-    def __init__(self,color,x,y):
+    def __init__(self, color, x, y):
         super().__init__()
         imagem = 'sprite/'+color+'.png'
         self.image = pygame.image.load(imagem).convert_alpha()

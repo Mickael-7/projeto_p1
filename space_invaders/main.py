@@ -1,8 +1,10 @@
 import pygame
 import sys
 import objeto
+import igor
 from player import Player
 from alien import Aliens
+from boss import Boss
 from random import choice
 from laser import Laser
 
@@ -16,13 +18,18 @@ class Game:
         self.musica_fundo = pygame.mixer_music.load('Battle Special.mp3')
         self.kill = 0
         self.lives = 5
+        self.y_creditos = 0
+
+        boss_sprite = Boss((300, 35))
+        self.boss = pygame.sprite.GroupSingle(boss_sprite)
+        self.boss_direcao = 1
+        self.life_boss = 5
+        self.boss_lasers = pygame.sprite.Group()
 
         self.aliens = pygame.sprite.Group()
         self.alien_lasers = pygame.sprite.Group()
         self.alien_setup(rows=6, cols=8)
         self.alien_direcao = 1
-
-        self.hit = 0
 
         self.shape = objeto.shape
         self.bloco_tam = 6
@@ -58,6 +65,15 @@ class Game:
                     alien_sprite = Aliens('whiteT', x, y)
                 self.aliens.add(alien_sprite)
 
+    def boss_posicao(self):
+        for boss in self.boss:
+            if boss.rect.right >= largura:
+                self.boss_direcao = -1
+
+            elif boss.rect.left <= 0:
+                self.boss_direcao = 1
+
+
     def alien_posicao_check(self):
         all_aliens = self.aliens.sprites()
         for aliens in all_aliens:
@@ -76,10 +92,20 @@ class Game:
     def alien_shoot(self):
         if self.aliens.sprites():
             random_alien = choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center, 6, altura,'red')
+            laser_sprite = Laser(random_alien.rect.center, 6, altura, 'red')
             self.alien_lasers.add(laser_sprite)
 
+    def boss_shoot(self):
+        if self.boss.sprites():
+            for boss in self.boss:
+                laser_boss = Laser(boss.rect.center, 8, altura, 'green')
+                self.boss_lasers.add(laser_boss)
+
     def colisao(self):
+        kill_boss = False
+        if self.life_boss <= 0:
+            kill_boss = True
+
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
                 if pygame.sprite.spritecollide(laser, self.blocos, True):
@@ -88,9 +114,16 @@ class Game:
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
                 if pygame.sprite.spritecollide(laser, self.aliens, True):
-                    laser.kill()
+                    #laser.kill()
                     self.kill += 1
                     self.som_morte.play()
+
+        if self.player.sprite.lasers:
+            for laser in self.player.sprite.lasers:
+                if pygame.sprite.spritecollide(laser, self.boss, kill_boss):
+                    laser.kill()
+                    self.kill += 10
+                    self.life_boss -= 1
 
         if self.aliens:
             for aliens in self.aliens:
@@ -112,23 +145,51 @@ class Game:
                         pygame.quit()
                         sys.exit()
 
+        if self.boss_lasers:
+            for laserB in self.boss_lasers:
+                if pygame.sprite.spritecollide(laserB, self.blocos, True):
+                    laserB.kill()
+
+                if pygame.sprite.spritecollide(laserB, self.player, False):
+                    laserB.kill()
+                    self.lives -= 1
+                    self.som_vida_player.play()
+                    if self.lives <= 0:
+                        pygame.quit()
+                        sys.exit()
+
     def vitoria(self):
-        if not self.aliens.sprites():
-            info = pygame.font.SysFont('arial', 15, True, True)
-            mensagemV = 'YOU WIN'
-            textoV = info.render(mensagemV, True, (255, 255, 255))
-            tela.blit(textoV, (250, 300))
+        if not self.aliens.sprites() and not self.boss.sprites():
+            for blocos in self.blocos:
+                blocos.kill()
+            if self.kill >= 108:
+                self.y_creditos -= 0.5
+            linhas = igor.credito.split('\n')
+            y = 650
+            for linha in linhas:
+                texto_renderizado = fonte3.render(linha, True, 'yellow')
+                tela.blit(texto_renderizado, (100, y+self.y_creditos))
+                y += 30
+
+
 
     def run(self):
         self.player.update()
         self.player.sprite.lasers.draw(tela)
         self.player.draw(tela)
 
+        self.boss.draw(tela)
+        self.boss_posicao()
+        self.boss.update(self.boss_direcao)
+        self.boss_lasers.update()
+        self.boss_lasers.draw(tela)
+
         self.aliens.draw(tela)
         self.alien_posicao_check()
         self.aliens.update(self.alien_direcao)
         self.alien_lasers.update()
         self.alien_lasers.draw(tela)
+
         self.blocos.draw(tela)
         self.vitoria()
 
@@ -148,24 +209,29 @@ if __name__ == '__main__':
     bg = pygame.image.load('sprite/background.png').convert_alpha()
     bg = pygame.transform.scale(bg, (largura, altura))
     fonte = pygame.font.SysFont('arial', 15, True, True)
+    fonte3 = pygame.font.SysFont('arial', 10, True, True)
     fonte2 = pygame.font.SysFont('arial', 15, True, True)
     pygame.mixer.music.play(-1)
 
     alienL = pygame.USEREVENT + 1
     pygame.time.set_timer(alienL, 700)
 
+    bossL = pygame.USEREVENT + 1
+    pygame.time.set_timer(bossL, 900)
+
     while True:
         mensagem = f'PONTOS: {game.kill}'
         mensagem2 = f'VIDAS: {game.lives}'
         texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
         texto_formatado2 = fonte2.render(mensagem2, True, (255, 255, 255))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == alienL:
                 game.alien_shoot()
+            if event.type == bossL:
+                game.boss_shoot()
 
         tela.blit(bg, (0, 0))
 
