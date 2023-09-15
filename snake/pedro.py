@@ -4,7 +4,7 @@ import random as rd
 from sys import exit
 
 pg.init()
-tamanhoQuadrado = 30
+tamanhoQuadrado = 25
 TAMANHO_TELA = (600,600)
 tela = pg.display.set_mode(TAMANHO_TELA)
 largura, altura = TAMANHO_TELA
@@ -13,43 +13,43 @@ relogio = pg.time.Clock()
 janela = pg.display.set_caption('Snake')
 
 class Cobra:
-
+    # Método construtor
     def __init__(self):
         self.x, self.y = largura/2, altura/2
         self.deslocamento = 1
         self.xdir = self.deslocamento
         self.ydir = 0
-        self.corpo = [pg.Rect(self.x - tamanhoQuadrado, self.y, tamanhoQuadrado, tamanhoQuadrado)]
         self.cabeca = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
+        self.corpo = [self.cabeca.copy()]
         self.delay = 90
         self.time = 0
-
+    
+    # Função para controlar a velocidade da cobra
     def delta_time(self):
         time_now = pg.time.get_ticks()
         if time_now - self.time > self.delay:
             self.time = time_now
             return True
         return False
-
-    def morte(self):
-        global maca
-        self.x, self.y = largura/2, altura/2
-        self.corpo = [pg.Rect(self.x - tamanhoQuadrado, self.y, tamanhoQuadrado, tamanhoQuadrado)]
+    
+    # Função para resetar os padrões quando a cobra morre
+    def resetar(self):
+        self.x, self.y = largura/2 - tamanhoQuadrado, altura/2 - tamanhoQuadrado
         self.cabeca = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
+        self.corpo = [self.cabeca.copy()]
         self.xdir = 1
         self.ydir = 0
         self.dead = False
-        maca = Maca()
 
-    def atualizar(self):
+    def morte(self):
         for quadrado in self.corpo:
             if cobra.cabeca.x == quadrado.x and cobra.cabeca.y == quadrado.y:
-                self.morte()
-            
-            if self.cabeca.x not in range(0, largura) or self.cabeca.y not in range(0, largura):
-                self.morte()
+                self.resetar()
+            if self.cabeca.x not in range(0, largura) or self.cabeca.y not in range(0, altura):
+                self.resetar()
+
+    def atualizar(self):    
         self.corpo.append(self.cabeca)
-        
         for i in range(len(self.corpo) - 1):
             self.corpo[i].x, self.corpo[i].y = self.corpo[i + 1].x, self.corpo[i + 1].y
         
@@ -57,6 +57,7 @@ class Cobra:
         self.cabeca.y += self.ydir * tamanhoQuadrado
         self.corpo.remove(self.cabeca)
 
+    # Função para movimentar a cobra, tanto com WASD quanto com as setas
     def movimento(self):
         if event.key == pg.K_w or event.key == pg.K_UP:
             if cobra.ydir == cobra.deslocamento:
@@ -89,26 +90,29 @@ class Cobra:
 
 class Maca:
     def __init__(self):
-        self.x = int(rd.randint(0, largura) / tamanhoQuadrado) * tamanhoQuadrado
-        self.y = int(rd.randint(0, largura) / tamanhoQuadrado) * tamanhoQuadrado
+        self.x = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
+        self.y = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
         self.retangulo = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
 
-    def atualizarMaçã(self):
-        pg.draw.rect(tela, 'red', self.retangulo)
+    def desenharmaçã(self):
+        pg.draw.rect(tela, '#E96D6D', self.retangulo)
 
 
 def desenhoGrade():
     for x in range(0, largura, tamanhoQuadrado):
-        for y in range(0, altura, tamanhoQuadrado):
+        for y in range(tamanhoQuadrado, altura, tamanhoQuadrado):
             rect = pg.Rect(x, y, tamanhoQuadrado, tamanhoQuadrado)
-            pg.draw.rect(tela, 'black', rect, 1)
+            pg.draw.rect(tela, "#586C51", rect, 1)
 
 
 def desenhar_pontuacao(pontuacao):
     fonte = pg.font.SysFont('Helveitica', 30)
-    texto = fonte.render(f'Pontos: {pontuacao}', True, (255, 0, 0))
-    tela.blit(texto, [0, 0])
+    frase = f"Pontos: {pontuacao}"
+    texto = fonte.render(frase, True, (255, 255, 255))
+    tela.blit(texto, [255, 4])
 
+def desenhar_retangulo():
+    pg.draw.rect(tela, "#586C51", (0, 0, 600, tamanhoQuadrado))
 
 '''class Musicas():
     def __init__(self):
@@ -127,7 +131,7 @@ maca = Maca()
 '''musicas = Musicas()
 musicas.musica_fundo()'''
 while True:
-    tela.fill('black')
+    tela.fill("#9EE983")
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
@@ -136,24 +140,26 @@ while True:
         if event.type == pg.KEYDOWN:
             cobra.movimento()
 
-    if cobra.delta_time():
-        cobra.atualizar()
-        
+    desenhar_retangulo()
+    cobra.morte()
+    cobra.atualizar()
+    for quadrado in cobra.corpo:
+        pg.draw.rect(tela, "#586C51", quadrado)
+    pg.draw.rect(tela, "#586C51", cobra.cabeca)
 
     desenhoGrade()
 
-    maca.atualizarMaçã()
+    maca.desenharmaçã()
 
-    pg.draw.rect(tela, "green", cobra.cabeca)
-
-
-    for quadrado in cobra.corpo:
-        pg.draw.rect(tela, "green", quadrado)
-    if cobra.cabeca.x == maca.x and cobra.cabeca.y == maca.y:
+    # Condição para a cobra crescer quando comer a maçã
+    if cobra.cabeca.colliderect(maca.retangulo):
         cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, tamanhoQuadrado, tamanhoQuadrado))
         maca = Maca()
         '''musicas.musica_Colisao.play()'''
-    desenhar_pontuacao(len(cobra.corpo) - 1)
     
+    # Desenhar os pontos
+    desenhar_pontuacao(len(cobra.corpo)*10 - 10)
+    
+    # Atualização da tela e fps do display
     pg.display.flip()
-    relogio.tick(30)
+    relogio.tick(5)
