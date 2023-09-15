@@ -1,50 +1,59 @@
 import pygame as pg
+import constantes as cs
 from pygame.locals import *
 import random as rd
 from sys import exit
 
-pg.init()
-tamanhoQuadrado = 35
-TAMANHO_TELA = (700,700)
-tela = pg.display.set_mode(TAMANHO_TELA)
-largura, altura = TAMANHO_TELA
-relogio = pg.time.Clock()
-janela = pg.display.set_caption('Snake')
+class Jogo():
 
+    pg.init()
+    tela = pg.display.set_mode(cs.TAMANHO_TELA)
+    largura, altura = cs.TAMANHO_TELA
+    relogio = pg.time.Clock()
+    janela = pg.display.set_caption('Snake')
+jg = Jogo()
 class Cobra:
 
     def __init__(self):
-        self.x, self.y = largura/2, altura/2
+        self.x, self.y = jg.largura/2, jg.altura/2
         self.deslocamento = 1
         self.xdir = self.deslocamento
         self.ydir = 0
-        self.corpo = [pg.Rect(self.x - tamanhoQuadrado, self.y, tamanhoQuadrado, tamanhoQuadrado)]
-        self.cabeca = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
-        self.dead = False
-
-    def atualizar(self):
+        self.corpo = [pg.Rect(self.x - cs.TAMANHO_QUADRADO, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
+        self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+        self.delay = 90
+        self.time = 0
+        
+    def delta_time(self):
+        time_now = pg.time.get_ticks()
+        if time_now - self.time > self.delay:
+            self.time = time_now
+            return True
+        return False
+    def morte(self):
         global maca
+        self.x, self.y = jg.largura/2, jg.altura/2
+        self.corpo = [pg.Rect(self.x - cs.TAMANHO_QUADRADO, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
+        self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+        self.xdir = 1
+        self.ydir = 0
+        self.dead = False
+        maca = Maca()
+    def atualizar(self):
         for quadrado in self.corpo:
             if cobra.cabeca.x == quadrado.x and cobra.cabeca.y == quadrado.y:
-                self.dead = True
-            if self.cabeca.x not in range(0, largura) or self.cabeca.y not in range(0, largura):
-                self.dead = True
-            if self.dead:
-                self.x, self.y = largura/2, altura/2
-                self.corpo = [pg.Rect(self.x - tamanhoQuadrado, self.y, tamanhoQuadrado, tamanhoQuadrado)]
-                self.cabeca = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
-                self.xdir = 1
-                self.ydir = 0
-                self.dead = False
-                maca = Maca()
+                self.morte()
+            
+            if self.cabeca.x not in range(0, jg.largura) or self.cabeca.y not in range(0, jg.largura):
+                self.morte()
         self.corpo.append(self.cabeca)
+        
         for i in range(len(self.corpo) - 1):
             self.corpo[i].x, self.corpo[i].y = self.corpo[i + 1].x, self.corpo[i + 1].y
-        self.cabeca.x += self.xdir * tamanhoQuadrado
-        self.cabeca.y += self.ydir * tamanhoQuadrado
+        
+        self.cabeca.x += self.xdir * cs.TAMANHO_QUADRADO
+        self.cabeca.y += self.ydir * cs.TAMANHO_QUADRADO
         self.corpo.remove(self.cabeca)
-
-        self.tempo_agora = pg.time.get_ticks()
 
     def movimento(self):
         
@@ -79,25 +88,25 @@ class Cobra:
 class Maca:
 
     def __init__(self):
-        self.x = int(rd.randint(0, largura) / tamanhoQuadrado) * tamanhoQuadrado
-        self.y = int(rd.randint(0, largura) / tamanhoQuadrado) * tamanhoQuadrado
-        self.retangulo = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
+        self.x = int(rd.randint(0, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.y = int(rd.randint(0, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.retangulo = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
 
     def atualizarMaçã(self):
-        pg.draw.rect(tela, 'red', self.retangulo)
+        pg.draw.rect(jg.tela, 'red', self.retangulo)
 
 
-def desenhoGrande():
-    for x in range(0, largura, tamanhoQuadrado):
-        for y in range(0, altura, tamanhoQuadrado):
-            rect = pg.Rect(x, y, tamanhoQuadrado, tamanhoQuadrado)
-            pg.draw.rect(tela, '#3c3c3b', rect, 1)
+def desenhoGrade():
+    for x in range(0, jg.largura, cs.TAMANHO_QUADRADO):
+        for y in range(0, jg.altura, cs.TAMANHO_QUADRADO):
+            rect = pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+            pg.draw.rect(jg.tela, '#3c3c3b', rect, 1)
 
 
 def desenhar_pontuacao(pontuacao):
     fonte = pg.font.SysFont('Helveitica', 50)
     texto = fonte.render(f'Pontos: {pontuacao}', True, (255, 0, 0))
-    tela.blit(texto, [0, 0])
+    jg.tela.blit(texto, [0, 0])
 
 
 class Musicas():
@@ -110,14 +119,14 @@ class Musicas():
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
         pg.mixer.music.play(-1)
 
-desenhoGrande()
+desenhoGrade()
 cobra = Cobra()
 maca = Maca()
 
 musicas = Musicas()
 musicas.musica_fundo()
 while True:
-
+    jg.tela.fill('black')
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
@@ -126,26 +135,24 @@ while True:
         if event.type == pg.KEYDOWN:
             cobra.movimento()
 
+    if cobra.delta_time():
+        cobra.atualizar()
+        
 
-    cobra.atualizar()
-
-    tela.fill((0, 0, 0))
-
-    desenhoGrande()
+    desenhoGrade()
 
     maca.atualizarMaçã()
 
-    pg.draw.rect(tela, "green", cobra.cabeca)
+    pg.draw.rect(jg.tela, "green", cobra.cabeca)
+
 
     for quadrado in cobra.corpo:
-        pg.draw.rect(tela, "green", quadrado)
+        pg.draw.rect(jg.tela, "green", quadrado)
     if cobra.cabeca.x == maca.x and cobra.cabeca.y == maca.y:
-        cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, tamanhoQuadrado, tamanhoQuadrado))
+        cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
         maca = Maca()
-        musicas.musica_Colisao.play()
+        '''musicas.musica_Colisao.play()'''
     desenhar_pontuacao(len(cobra.corpo) - 1)
     
-
-    relogio.tick(5)
-
     pg.display.flip()
+    jg.relogio.tick(30)
