@@ -214,9 +214,9 @@ desenhoGrade()
 cobra = Cobra()
 maca = Maca()
 
-
 musicas = Musicas()
 musicas.musica_fundo()
+
 while True:
     jg.tela.fill("#9EE983")
     for event in pg.event.get():
