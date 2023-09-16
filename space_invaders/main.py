@@ -310,7 +310,7 @@ if __name__ == '__main__':
 
             pygame.display.flip()
             fps.tick(60)
-            if linhas == 200:
+            if game.y_creditos <= -5755:
                 pygame.quit()
                 sys.exit()
                 
