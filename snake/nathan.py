@@ -1,21 +1,84 @@
 import pygame as pg
 import constantes as cs
-from pygame.locals import *
+import os
 import random as rd
 from sys import exit
 
-class Jogo():
 
-    pg.init()
-    tela = pg.display.set_mode(cs.TAMANHO_TELA)
-    largura, altura = cs.TAMANHO_TELA
-    relogio = pg.time.Clock()
-    janela = pg.display.set_caption('Snake')
+class Jogo():
+    def __init__(self):
+        pg.init()
+        self.tela = pg.display.set_mode(cs.TAMANHO_TELA)
+        self.largura, self.altura = cs.TAMANHO_TELA
+        self.relogio = pg.time.Clock()
+        self.esta_rodando = True
+        self.janela = pg.display.set_caption('Snake')
+        self.fonte = pg.font.match_font(cs.FONTE)
+        self.carregar_arquivos()
+
+    def carregar_arquivos(self):
+        diretorio_imagem = os.path.join(os.getcwd(), "imagens")
+        self.diretorio_audios = os.path.join(os.getcwd(), "music")
+        self.cobra_start_logo = os.path.join(diretorio_imagem, cs.COBRA_START_LOGO)
+        self.cobra_start_logo = pg.image.load(self.cobra_start_logo).convert()
+
+    def mostrar_texto(self, texto, cor, tamanho, x, y):
+        # Exibe um texto na tela do jogo
+        fonte = pg.font.SysFont(self.fonte, tamanho)
+        texto = fonte.render(texto, True, cor)
+        texto_rect = texto.get_rect()
+        texto_rect.midtop = (x, y)
+        self.tela.blit(texto, texto_rect)
+    def mostrar_start_logo(self, x, y):
+        start_logo_rect = self.cobra_start_logo.get_rect()
+        start_logo_rect.midtop = (x,y)
+        self.tela.blit(self.cobra_start_logo, start_logo_rect)
+    def mostrar_tela_start(self):
+
+        pg.mixer.music.load(os.path.join(self.diretorio_audios,cs.MUSICA_START))
+        pg.mixer_music.set_volume(0.10)
+        pg.mixer.music.play()
+
+        self.mostrar_start_logo(self.largura/2, 0)
+        self.mostrar_texto(
+            "-Precione  qualquer tecla para jogar",
+             cs.PRETA,
+            40,
+            self.largura / 2,
+            500
+        )
+        self.mostrar_texto(
+            "Densolvolvido por: Nathan Dalbert e Pedro Ricardo",
+            cs.PRETA,
+            23,
+            self.largura / 2,
+            570
+        )
+
+
+        pg.display.flip()
+        self.esperar_por_jogador()
+    def esperar_por_jogador(self):
+        esperando = True
+        while esperando:
+            self.relogio.tick(cs.FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    esperando = False
+                    self.esta_rodando = False
+                if event.type == pg.KEYDOWN:
+                    esperando = False
+                    pg.mixer_music.stop()
+
+
 jg = Jogo()
+jg.mostrar_tela_start()
+
+
 class Cobra:
 
     def __init__(self):
-        self.x, self.y = jg.largura/2, jg.altura/2
+        self.x, self.y = jg.largura / 2, jg.altura / 2
         self.deslocamento = 1
         self.xdir = self.deslocamento
         self.ydir = 0
@@ -23,40 +86,41 @@ class Cobra:
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
         self.delay = 90
         self.time = 0
-        
+
     def delta_time(self):
         time_now = pg.time.get_ticks()
         if time_now - self.time > self.delay:
             self.time = time_now
             return True
         return False
+
     def morte(self):
         global maca
-        self.x, self.y = jg.largura/2, jg.altura/2
+        self.x, self.y = jg.largura / 2, jg.altura / 2
         self.corpo = [pg.Rect(self.x - cs.TAMANHO_QUADRADO, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
         self.xdir = 1
         self.ydir = 0
         self.dead = False
         maca = Maca()
+
     def atualizar(self):
         for quadrado in self.corpo:
             if cobra.cabeca.x == quadrado.x and cobra.cabeca.y == quadrado.y:
                 self.morte()
-            
+
             if self.cabeca.x not in range(0, jg.largura) or self.cabeca.y not in range(0, jg.largura):
                 self.morte()
         self.corpo.append(self.cabeca)
-        
+
         for i in range(len(self.corpo) - 1):
             self.corpo[i].x, self.corpo[i].y = self.corpo[i + 1].x, self.corpo[i + 1].y
-        
+
         self.cabeca.x += self.xdir * cs.TAMANHO_QUADRADO
         self.cabeca.y += self.ydir * cs.TAMANHO_QUADRADO
         self.corpo.remove(self.cabeca)
 
     def movimento(self):
-        
 
         if event.key == pg.K_w or event.key == pg.K_UP:
             if cobra.ydir == cobra.deslocamento:
@@ -77,7 +141,7 @@ class Cobra:
             else:
                 cobra.xdir = cobra.deslocamento
                 cobra.ydir = 0
-        elif event.key == pg.K_a or event.key ==  pg.K_LEFT:
+        elif event.key == pg.K_a or event.key == pg.K_LEFT:
             if cobra.xdir == cobra.deslocamento:
                 pass
             else:
@@ -98,26 +162,26 @@ class Maca:
 
 def desenhoGrade():
     for x in range(0, jg.largura, cs.TAMANHO_QUADRADO):
-        for y in range(0, jg.altura, cs.TAMANHO_QUADRADO):
+        for y in range(cs.TAMANHO_QUADRADO, jg.altura, cs.TAMANHO_QUADRADO):
             rect = pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
-            pg.draw.rect(jg.tela, '#3c3c3b', rect, 1)
+            pg.draw.rect(jg.tela, '#586C51', rect, 1)
 
 
 def desenhar_pontuacao(pontuacao):
-    fonte = pg.font.SysFont('Helveitica', 50)
-    texto = fonte.render(f'Pontos: {pontuacao}', True, (255, 0, 0))
-    jg.tela.blit(texto, [0, 0])
-
+    fonte = pg.font.SysFont('Helveitica', 30)
+    frase = f"Pontos: {pontuacao}"
+    texto = fonte.render(frase, True, (255, 255, 255))
+    jg.tela.blit(texto, [255, 4])
 
 class Musicas():
     def __init__(self):
-
         self.musica_Colisao = pg.mixer.Sound("music/smw_stomp.wav")
 
     def musica_fundo(self):
         pg.mixer_music.set_volume(0.15)
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
         pg.mixer.music.play(-1)
+
 
 desenhoGrade()
 cobra = Cobra()
@@ -126,7 +190,7 @@ maca = Maca()
 musicas = Musicas()
 musicas.musica_fundo()
 while True:
-    jg.tela.fill('black')
+    jg.tela.fill("#9EE983")
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
@@ -137,22 +201,22 @@ while True:
 
     if cobra.delta_time():
         cobra.atualizar()
-        
 
     desenhoGrade()
 
     maca.atualizarMaçã()
 
-    pg.draw.rect(jg.tela, "green", cobra.cabeca)
+    pg.draw.rect(jg.tela, "#586C51", (0, 0, 600, cs.TAMANHO_QUADRADO))
 
+    pg.draw.rect(jg.tela, "green", cobra.cabeca)
 
     for quadrado in cobra.corpo:
         pg.draw.rect(jg.tela, "green", quadrado)
     if cobra.cabeca.x == maca.x and cobra.cabeca.y == maca.y:
         cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
         maca = Maca()
-        '''musicas.musica_Colisao.play()'''
-    desenhar_pontuacao(len(cobra.corpo) - 1)
-    
+        musicas.musica_Colisao.play()
+    desenhar_pontuacao(len(cobra.corpo) * 10 - 10)
+
     pg.display.flip()
-    jg.relogio.tick(30)
+    jg.relogio.tick(cs.FPS)

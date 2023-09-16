@@ -12,9 +12,14 @@ relogio = pg.time.Clock()
 
 janela = pg.display.set_caption('Snake')
 
+def randomizar():
+    x = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
+    y = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
+    return x, y
+
 class Cobra:
     # Método construtor
-    def __init__(self):
+    def _init_(self):
         self.x, self.y = largura/2, altura/2
         self.deslocamento = 1
         self.xdir = self.deslocamento
@@ -34,19 +39,21 @@ class Cobra:
     
     # Função para resetar os padrões quando a cobra morre
     def resetar(self):
+        global maca
         self.x, self.y = largura/2 - tamanhoQuadrado, altura/2 - tamanhoQuadrado
         self.cabeca = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
         self.corpo = [self.cabeca.copy()]
         self.xdir = 1
         self.ydir = 0
         self.dead = False
+        maca = Maca()
 
+    # Motivos para que a cobra morra
     def morte(self):
-        for quadrado in self.corpo:
-            if cobra.cabeca.x == quadrado.x and cobra.cabeca.y == quadrado.y:
-                self.resetar()
-            if self.cabeca.x not in range(0, largura) or self.cabeca.y not in range(0, altura):
-                self.resetar()
+        if cobra.cabeca.collidelistall(self.corpo):
+            self.resetar()
+        if self.cabeca.x not in range(0, largura) or self.cabeca.y not in range(tamanhoQuadrado, altura):
+            self.resetar()
 
     def atualizar(self):    
         self.corpo.append(self.cabeca)
@@ -89,14 +96,16 @@ class Cobra:
 
 
 class Maca:
-    def __init__(self):
-        self.x = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
-        self.y = int(rd.randint(tamanhoQuadrado, largura) / tamanhoQuadrado) * tamanhoQuadrado
+    def _init_(self):
+        self.x, self.y = randomizar()
         self.retangulo = pg.Rect(self.x, self.y, tamanhoQuadrado, tamanhoQuadrado)
 
     def desenharmaçã(self):
-        pg.draw.rect(tela, '#E96D6D', self.retangulo)
+        pg.draw.rect(tela, '#F78B8B', self.retangulo)
 
+
+def desenhar_parede(x, y):
+    pg.draw.rect(tela, 'black', (x, y, tamanhoQuadrado, tamanhoQuadrado))
 
 def desenhoGrade():
     for x in range(0, largura, tamanhoQuadrado):
@@ -104,18 +113,14 @@ def desenhoGrade():
             rect = pg.Rect(x, y, tamanhoQuadrado, tamanhoQuadrado)
             pg.draw.rect(tela, "#586C51", rect, 1)
 
-
 def desenhar_pontuacao(pontuacao):
     fonte = pg.font.SysFont('Helveitica', 30)
     frase = f"Pontos: {pontuacao}"
     texto = fonte.render(frase, True, (255, 255, 255))
     tela.blit(texto, [255, 4])
 
-def desenhar_retangulo():
-    pg.draw.rect(tela, "#586C51", (0, 0, 600, tamanhoQuadrado))
-
 '''class Musicas():
-    def __init__(self):
+    def _init_(self):
 
         self.musica_Colisao = pg.mixer.Sound("music/smw_stomp.wav")
 
@@ -123,8 +128,6 @@ def desenhar_retangulo():
         pg.mixer_music.set_volume(0.15)
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
         pg.mixer.music.play(-1)'''
-
-desenhoGrade()
 cobra = Cobra()
 maca = Maca()
 
@@ -132,21 +135,22 @@ maca = Maca()
 musicas.musica_fundo()'''
 while True:
     tela.fill("#9EE983")
+    
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
             exit()
-
         if event.type == pg.KEYDOWN:
             cobra.movimento()
 
-    desenhar_retangulo()
+    pg.draw.rect(tela, "#586C51", (0, 0, 600, tamanhoQuadrado))
     cobra.morte()
     cobra.atualizar()
+    
+    pg.draw.rect(tela, "#586C51", cobra.cabeca)
     for quadrado in cobra.corpo:
         pg.draw.rect(tela, "#586C51", quadrado)
-    pg.draw.rect(tela, "#586C51", cobra.cabeca)
-
+    
     desenhoGrade()
 
     maca.desenharmaçã()
@@ -156,10 +160,14 @@ while True:
         cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, tamanhoQuadrado, tamanhoQuadrado))
         maca = Maca()
         '''musicas.musica_Colisao.play()'''
+    x_parede, y_parede = randomizar()
+
+    if len(cobra.corpo) >= 5:
+        desenhar_parede(x_parede, y_parede)
     
     # Desenhar os pontos
     desenhar_pontuacao(len(cobra.corpo)*10 - 10)
     
     # Atualização da tela e fps do display
     pg.display.flip()
-    relogio.tick(5)
+    relogio.tick(10)
