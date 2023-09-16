@@ -82,9 +82,9 @@ class Cobra:
         self.deslocamento = 1
         self.xdir = self.deslocamento
         self.ydir = 0
-        self.corpo = [pg.Rect(self.x - cs.TAMANHO_QUADRADO, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
+        self.corpo = [pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
-        self.delay = 90
+        self.delay = 70
         self.time = 0
 
     def delta_time(self):
@@ -94,24 +94,25 @@ class Cobra:
             return True
         return False
 
-    def morte(self):
-        global maca
+    def reset(self):
         self.x, self.y = jg.largura / 2, jg.altura / 2
         self.corpo = [pg.Rect(self.x - cs.TAMANHO_QUADRADO, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
         self.xdir = 1
         self.ydir = 0
-        self.dead = False
-        maca = Maca()
+        maca.reset()  
 
     def atualizar(self):
         for quadrado in self.corpo:
             if cobra.cabeca.x == quadrado.x and cobra.cabeca.y == quadrado.y:
-                self.morte()
-
+                self.reset()
+            for barreira in barreiras.barreiras:
+                if cobra.cabeca.colliderect(barreira):
+                  self.reset()
             if self.cabeca.x not in range(0, jg.largura) or self.cabeca.y not in range(0, jg.largura):
-                self.morte()
+                self.reset()
         self.corpo.append(self.cabeca)
+        
 
         for i in range(len(self.corpo) - 1):
             self.corpo[i].x, self.corpo[i].y = self.corpo[i + 1].x, self.corpo[i + 1].y
@@ -152,9 +153,13 @@ class Cobra:
 class Maca:
 
     def __init__(self):
-        self.x = int(rd.randint(0, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-        self.y = int(rd.randint(0, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-        self.retangulo = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+        self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.retangulo = pg.Rect(self.x , self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+    def reset(self):
+        self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.retangulo = pg.Rect(self.x , self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
 
     def atualizarMaçã(self):
         pg.draw.rect(jg.tela, 'red', self.retangulo)
@@ -181,11 +186,34 @@ class Musicas():
         pg.mixer_music.set_volume(0.15)
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
         pg.mixer.music.play(-1)
+class Barreiras:
+    def __init__(self, num_barreiras):
+        self.barreiras = []
+        self.num_barreiras = num_barreiras
+        self.gerar_barreiras()
+
+    def gerar_barreiras(self):
+        for i in range(self.num_barreiras):
+            x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+            y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+            self.barreiras.append(pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
+
+    def barreira_tela(self):
+        for retangulo in self.barreiras:
+            pg.draw.rect(jg.tela, cs.CINZA, retangulo)
 
 
+
+            
+            
+            
+        
+barreiras = Barreiras(5)
+ 
 desenhoGrade()
 cobra = Cobra()
 maca = Maca()
+
 
 musicas = Musicas()
 musicas.musica_fundo()
@@ -205,6 +233,8 @@ while True:
     desenhoGrade()
 
     maca.atualizarMaçã()
+    barreiras.barreira_tela()
+    
 
     pg.draw.rect(jg.tela, "#586C51", (0, 0, 600, cs.TAMANHO_QUADRADO))
 
@@ -217,6 +247,7 @@ while True:
         maca = Maca()
         musicas.musica_Colisao.play()
     desenhar_pontuacao(len(cobra.corpo) * 10 - 10)
-
+    
+        
     pg.display.flip()
     jg.relogio.tick(cs.FPS)

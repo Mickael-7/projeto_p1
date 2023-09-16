@@ -16,6 +16,7 @@ FONTE = 'arial'
 PRETA = (0,0,0)
 VERDE = (0,255,0)
 BRANCA = (255,255,255)
+CINZA = (96,96,96)
 
 
 #audios
