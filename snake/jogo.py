@@ -14,9 +14,9 @@ class Jogo():
         self.esta_rodando = True
         self.janela = pg.display.set_caption('Snake')
         self.fonte = pg.font.match_font(cs.FONTE)
-        self.carregar_arquivos()
+        '''self.carregar_arquivos()'''
 
-    def carregar_arquivos(self):
+    '''def carregar_arquivos(self):
         diretorio_imagem = os.path.join(os.getcwd(), "imagens")
         self.diretorio_audios = os.path.join(os.getcwd(), "music")
         self.cobra_start_logo = os.path.join(diretorio_imagem, cs.COBRA_START_LOGO)
@@ -34,7 +34,6 @@ class Jogo():
         start_logo_rect.midtop = (x,y)
         self.tela.blit(self.cobra_start_logo, start_logo_rect)
     def mostrar_tela_start(self):
-
         pg.mixer.music.load(os.path.join(self.diretorio_audios,cs.MUSICA_START))
         pg.mixer_music.set_volume(0.10)
         pg.mixer.music.play()
@@ -68,11 +67,11 @@ class Jogo():
                     self.esta_rodando = False
                 if event.type == pg.KEYDOWN:
                     esperando = False
-                    pg.mixer_music.stop()
+                    pg.mixer_music.stop()'''
 
 
 jg = Jogo()
-jg.mostrar_tela_start()
+#jg.mostrar_tela_start()
 
 
 class Cobra:
@@ -84,7 +83,7 @@ class Cobra:
         self.ydir = 0
         self.corpo = [pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)]
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
-        self.delay = 70
+        self.delay = 90
         self.time = 0
 
     def delta_time(self):
@@ -100,7 +99,9 @@ class Cobra:
         self.cabeca = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
         self.xdir = 1
         self.ydir = 0
-        maca.reset()  
+        self.delay = 70
+        maca.reset()
+        barreiras.barreiras.clear()
 
     def atualizar(self):
         for quadrado in self.corpo:
@@ -109,7 +110,7 @@ class Cobra:
             for barreira in barreiras.barreiras:
                 if cobra.cabeca.colliderect(barreira):
                   self.reset()
-            if self.cabeca.x not in range(0, jg.largura) or self.cabeca.y not in range(0, jg.largura):
+            if self.cabeca.x not in range(0, jg.largura) or self.cabeca.y not in range(cs.TAMANHO_QUADRADO, jg.largura):
                 self.reset()
         self.corpo.append(self.cabeca)
         
@@ -164,12 +165,11 @@ class Maca:
     def atualizarMaçã(self):
         pg.draw.rect(jg.tela, 'red', self.retangulo)
 
-
 def desenhoGrade():
     for x in range(0, jg.largura, cs.TAMANHO_QUADRADO):
         for y in range(cs.TAMANHO_QUADRADO, jg.altura, cs.TAMANHO_QUADRADO):
             rect = pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
-            pg.draw.rect(jg.tela, '#586C51', rect, 1)
+            pg.draw.rect(jg.tela, (42, 51, 26), rect, 1)
 
 
 def desenhar_pontuacao(pontuacao):
@@ -178,14 +178,15 @@ def desenhar_pontuacao(pontuacao):
     texto = fonte.render(frase, True, (255, 255, 255))
     jg.tela.blit(texto, [255, 4])
 
-class Musicas():
+'''class Musicas():
     def __init__(self):
         self.musica_Colisao = pg.mixer.Sound("music/smw_stomp.wav")
 
     def musica_fundo(self):
         pg.mixer_music.set_volume(0.15)
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
-        pg.mixer.music.play(-1)
+        pg.mixer.music.play(-1)'''
+
 class Barreiras:
     def __init__(self, num_barreiras):
         self.barreiras = []
@@ -202,23 +203,29 @@ class Barreiras:
         for retangulo in self.barreiras:
             pg.draw.rect(jg.tela, cs.CINZA, retangulo)
 
+    def adicionar_barreiras(self):
+        if len(cobra.corpo) + 1:
+            x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+            y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+            self.barreiras.append(pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
+
 
 
             
             
             
         
-barreiras = Barreiras(5)
+barreiras = Barreiras(3)
  
 desenhoGrade()
 cobra = Cobra()
 maca = Maca()
 
-musicas = Musicas()
-musicas.musica_fundo()
+'''musicas = Musicas()
+musicas.musica_fundo()'''
 
 while True:
-    jg.tela.fill("#9EE983")
+    jg.tela.fill((155, 186, 89))
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
@@ -236,18 +243,22 @@ while True:
     barreiras.barreira_tela()
     
 
-    pg.draw.rect(jg.tela, "#586C51", (0, 0, 600, cs.TAMANHO_QUADRADO))
+    pg.draw.rect(jg.tela, (42, 51, 26), (0, 0, 600, cs.TAMANHO_QUADRADO))
 
-    pg.draw.rect(jg.tela, "green", cobra.cabeca)
-
+    pg.draw.rect(jg.tela, (42, 51, 26), cobra.cabeca)
     for quadrado in cobra.corpo:
-        pg.draw.rect(jg.tela, "green", quadrado)
+        pg.draw.rect(jg.tela, (42, 51, 26), quadrado)
+    
     if cobra.cabeca.x == maca.x and cobra.cabeca.y == maca.y:
         cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
         maca = Maca()
-        musicas.musica_Colisao.play()
+        x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        barreiras.barreiras.append(pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
+        if len(cobra.corpo) >= 5:
+            cobra.delay -= 1
+        #musicas.musica_Colisao.play()
     desenhar_pontuacao(len(cobra.corpo) * 10 - 10)
-    
         
     pg.display.flip()
     jg.relogio.tick(cs.FPS)
