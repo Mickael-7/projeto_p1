@@ -1,6 +1,7 @@
 import pygame
 import sys
 import objeto
+import os
 import igor
 from player import Player
 from alien import Aliens
@@ -9,15 +10,21 @@ from random import choice
 from laser import Laser
 
 
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+
 class Game:
     def __init__(self):
         player_sprite = Player((largura/2, altura), largura, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
-        self.som_morte = pygame.mixer.Sound('invaderkilled_.mp3')
-        self.som_vida_player = pygame.mixer.Sound('explosion.wav')
-        self.musica_fundo = pygame.mixer_music.load('Battle Special.mp3')
+        self.som_morte = pygame.mixer.Sound('music/invaderkilled_.mp3')
+        self.som_vida_player = pygame.mixer.Sound('music/explosion.wav')
+        self.musica_fundo = pygame.mixer_music.load('music/Battle Special.mp3')
+        self.boss_hit = pygame.mixer.Sound('music/video-game-hit-noise-001-135821.mp3')
         self.kill = 0
-        self.lives = 5
+        self.lives = 3
         self.y_creditos = 0
 
         boss_sprite = Boss((300, 35))
@@ -73,7 +80,6 @@ class Game:
             elif boss.rect.left <= 0:
                 self.boss_direcao = 1
 
-
     def alien_posicao_check(self):
         all_aliens = self.aliens.sprites()
         for aliens in all_aliens:
@@ -114,7 +120,7 @@ class Game:
         if self.player.sprite.lasers:
             for laser in self.player.sprite.lasers:
                 if pygame.sprite.spritecollide(laser, self.aliens, True):
-                    #laser.kill()
+                    laser.kill()
                     self.kill += 1
                     self.som_morte.play()
 
@@ -124,6 +130,7 @@ class Game:
                     laser.kill()
                     self.kill += 10
                     self.life_boss -= 1
+                    self.boss_hit.play()
 
         if self.aliens:
             for aliens in self.aliens:
@@ -141,9 +148,6 @@ class Game:
                     laser.kill()
                     self.lives -= 1
                     self.som_vida_player.play()
-                    if self.lives <= 0:
-                        pygame.quit()
-                        sys.exit()
 
         if self.boss_lasers:
             for laserB in self.boss_lasers:
@@ -154,24 +158,6 @@ class Game:
                     laserB.kill()
                     self.lives -= 1
                     self.som_vida_player.play()
-                    if self.lives <= 0:
-                        pygame.quit()
-                        sys.exit()
-
-    def vitoria(self):
-        if not self.aliens.sprites() and not self.boss.sprites():
-            for blocos in self.blocos:
-                blocos.kill()
-            if self.kill >= 108:
-                self.y_creditos -= 0.5
-            linhas = igor.credito.split('\n')
-            y = 650
-            for linha in linhas:
-                texto_renderizado = fonte3.render(linha, True, 'yellow')
-                tela.blit(texto_renderizado, (100, y+self.y_creditos))
-                y += 30
-
-
 
     def run(self):
         self.player.update()
@@ -191,7 +177,6 @@ class Game:
         self.alien_lasers.draw(tela)
 
         self.blocos.draw(tela)
-        self.vitoria()
 
         self.colisao()
 
@@ -209,42 +194,120 @@ if __name__ == '__main__':
     bg = pygame.image.load('sprite/background.png').convert_alpha()
     bg = pygame.transform.scale(bg, (largura, altura))
     fonte = pygame.font.SysFont('arial', 15, True, True)
-    fonte3 = pygame.font.SysFont('arial', 10, True, True)
+    fonte3 = pygame.font.SysFont('arial', 20, True, True)
     fonte2 = pygame.font.SysFont('arial', 15, True, True)
     pygame.mixer.music.play(-1)
 
     alienL = pygame.USEREVENT + 1
     pygame.time.set_timer(alienL, 700)
-
+    som_de_perdedor = 1
+    som_de_vencedor = 1
     bossL = pygame.USEREVENT + 1
     pygame.time.set_timer(bossL, 900)
 
     while True:
-        mensagem = f'PONTOS: {game.kill}'
-        mensagem2 = f'VIDAS: {game.lives}'
-        texto_formatado = fonte.render(mensagem, True, (255, 255, 255))
-        texto_formatado2 = fonte2.render(mensagem2, True, (255, 255, 255))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == alienL:
-                game.alien_shoot()
-            if event.type == bossL:
-                game.boss_shoot()
 
-        tela.blit(bg, (0, 0))
+        if game.lives > 0 and game.kill < 108:
 
-        real_y = altura % bg.get_rect().height
+            pontos = f'PONTOS: {game.kill}'
+            vidas = f'VIDAS: {game.lives}'
+            texto_formatado = fonte.render(pontos, True, (255, 255, 255))
+            texto_formatado_2 = fonte.render(vidas, True, (255, 255, 255))
 
-        tela.blit(bg, (0, real_y - bg.get_rect().height))
-        tela.blit(texto_formatado, (15, 20))
-        tela.blit(texto_formatado2, (500,20))
-        if real_y < 650:
-            tela.blit(bg, (0, real_y))
-        altura += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == alienL:
+                    game.alien_shoot()
+                if event.type == bossL:
+                    game.boss_shoot()
 
-        game.run()
+            tela.blit(bg, (0, 0))
 
-        pygame.display.flip()
-        fps.tick(60)
+            real_y = altura % bg.get_rect().height
+
+            tela.blit(bg, (0, real_y - bg.get_rect().height))
+            tela.blit(texto_formatado, (15, 20))
+            tela.blit(texto_formatado_2, (520, 20))
+            if real_y < 650:
+                tela.blit(bg, (0, real_y))
+            altura += 1
+
+            game.run()
+
+            pygame.display.flip()
+            fps.tick(60)
+        elif game.lives == 0 and game.kill < 108:
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            pygame.mixer.music.unload()
+            tela.blit(bg, (0, 0))
+
+            if som_de_perdedor == 1:
+                som_loser = pygame.mixer.Sound('music/Sound _Fail.mp3')
+                som_loser.play()
+                som_de_perdedor = 0
+
+            loser2 = 'VOCÊ FALHOU COM SUA MISSÃO'
+            loser3 = 'PRESSIONE "R" PARA TENTAR NOVAMENTE'
+            loser = 'WASTED'
+
+            texto_loser = fonte.render(loser, True, (255, 0, 0))
+            texto_loser_2 = fonte2.render(loser2, True, (255, 255, 255))
+            texto_loser_3 = fonte2.render(loser3, True, (255, 255, 255))
+
+            tela.blit(texto_loser, (258, 220))
+            tela.blit(texto_loser_2, (158, 300))
+            tela.blit(texto_loser_3, (128, 350))
+
+            tecla = pygame.key.get_pressed()
+            pygame.display.flip()
+            fps.tick(60)
+
+            if tecla[pygame.K_r]:
+                game.lives = 5
+                game.run()
+                restart_program()
+        elif game.kill >= 108:
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            pygame.mixer.music.unload()
+
+            if som_de_vencedor == 1:
+                som_vencedor = pygame.mixer.Sound('music/vencedor.mp3')
+                som_vencedor.play()
+                som_de_vencedor = 0
+
+
+            tela.blit(bg, (0, 0))
+
+            real_y = altura % bg.get_rect().height
+
+            tela.blit(bg, (0, real_y - bg.get_rect().height))
+
+            if real_y < 650:
+                tela.blit(bg, (0, real_y))
+            altura += 1
+
+            game.y_creditos -= 1
+            linhas = igor.credito.split('\n')
+            y = 650
+            for linha in linhas:
+                texto_renderizado = fonte3.render(linha, True, 'yellow')
+                tela.blit(texto_renderizado, (50, y + game.y_creditos))
+                y += 30
+
+            pygame.display.flip()
+            fps.tick(60)
+            if linhas == 200:
+                break
+                

@@ -1,70 +1,160 @@
-credito = """Mensagem de Pós-Créditos - Jogo Revolucionário: Geração Galáctica
-
-Desenvolvedores Principais:
-
-- Igor Emanuel Oliveira Rego
-- Mickael de Albuquerque Silva
-
-Créditos Especiais:
-
-Pioneiros da Indústria de Jogos:
-
-- Atari
-- Taito Corporation
-
-Criador do Jogo Clássico:
-
-- Tomohiro Nishikado
-
-Designer Visionário:
-
-- Yoshiharu Satō
-
-Equipe de Desenvolvimento:
-
-Designers de Jogabilidade:
-
-- Carlos Eduardo Ferreira da Costa
-- Mariana Alves Pereira
-
-Artistas Interplanetários:
-
-- Paula Cristina dos Santos
-- Renato Augusto Barbosa
-
-Compositores Galácticos:
-
-- Lucas Antônio Pereira
-- Beatriz Maria dos Santos
-
-Efeitos Visuais Cósmicos:
-
-- Victor Hugo da Silva Almeida
-- Juliana Fernandes Mendes
-
-Testadores Intrépidos:
-
-- Andréa Ferreira Nunes
-- Felipe Rodrigues Santos
-
-Supervisores de Projeto Estelares:
-
-- Rafaela Gonçalves de Souza
-- Ricardo José Oliveira
-
-Agradecimentos Especiais:
-
-- Às mentes brilhantes que moldaram o passado
- e inspiraram o futuro dos jogos.
-- A todos os jogadores que viajaram pela galáxia conosco e exploraram
- cada canto deste vasto universo.
-
-Enquanto as estrelas brilharem e os jogadores continuarem a sonhar,
-a jornada nunca terá um fim.
-
-Geração Galáctica - Onde a História e o Futuro se Encontram.
-
-© 2023 Todos os Direitos Reservados
-             YOU WIN """
+credito = """
 
 
+
+                                  YOU WIN !
+
+
+
+
+
+
+     Enquanto as estrelas brilharem e os jogadores 
+
+            continuarem a sonhar, a jornada nunca
+
+                                  terá um fim.
+
+
+
+
+                          Geração Galáctica -
+
+         Onde a História e o Futuro se Encontram.
+
+
+
+
+
+
+
+
+                                Créditos Finais:
+
+
+
+                    O Jogo: "SPACE INVADERS"
+
+                            Desenvolvido por:
+
+                    Igor Emanuel Oliveira Rego
+
+
+                    Mickael de Albuquerque Silva
+
+                    - Diretor de Desenvolvimento
+
+                    - Designer de Jogo
+
+                    - Programador Principal
+
+                    - Diretor de Arte
+
+                    - Designer de Personagens
+
+                    - Artista de Animação
+
+
+
+
+
+
+
+
+                        Agradecimentos Especiais
+                                        para
+                a Nossos Talentosos Ajudantes:
+
+
+
+
+                                Pedro Ricardo
+
+                    - Artista de Ambientes
+
+                    - Modelador 3D
+
+
+                              Nathan Dalbert
+
+                    - Programador de IA
+
+                    - Designer de Missões
+
+
+                            Rian de Noronha
+
+                    - Compositor de Trilha Sonora
+
+                    - Sound Designer
+
+
+
+                            Paulo Henrique
+
+                    - Testador de Qualidade
+
+                    - Consultor de Gameplay
+
+
+
+
+
+                    A todos os que se aventuraram
+
+                    no espaço profundo,
+
+              exploraram galáxias distantes e
+
+                   combateram desafios
+
+              inimagináveis,dizemos com gratidão:
+
+
+                         "Missão Cumprida."
+
+
+            Agradecemos a todos os nossos amigos,
+
+
+            familiares e apoiadorespor seu incrível
+
+
+                 suporte ao longo deste projeto.
+
+                 Sem vocês, "SPACE INVADERS"
+
+            NÃO TERIA SIDO POSSiVEL
+
+
+            E, claro, um agradecimento especial
+
+
+                     aos nossos jogadores.
+
+                 Vocês são a razão pela qual
+
+                   fazemos o que fazemos.
+
+            Esperamos que tenham desfrutado desta
+
+
+               jornada épica tanto quanto nós!
+
+
+
+
+                       Até a próxima aventura!
+
+                   Equipe de Desenvolvimento de:
+
+
+
+
+
+
+
+
+                            "SPACE INVADERS"
+
+ """
