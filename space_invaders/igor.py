@@ -18,41 +18,8 @@ credito = """
 
 
 
-                          Geração Galáctica -
-
-         Onde a História e o Futuro se Encontram.
-
-
-
-
-
-
-
-
-                                Créditos Finais:
-
-
-
-                    O Jogo: "SPACE INVADERS"
-
-                            Desenvolvido por:
-
-                    Igor Emanuel Oliveira Rego
-
-
-                    Mickael de Albuquerque Silva
-
-                    - Diretor de Desenvolvimento
-
-                    - Designer de Jogo
-
-                    - Programador Principal
-
-                    - Diretor de Arte
-
-                    - Designer de Personagens
-
-                    - Artista de Animação
+                            Geração Galáctica
+            Onde a História e o Futuro se Encontram.
 
 
 
@@ -61,54 +28,95 @@ credito = """
 
 
 
-                        Agradecimentos Especiais
-                                        para
-                a Nossos Talentosos Ajudantes:
+                             Créditos Finais:
+
+
+
+                   O Jogo: "SPACE INVADERS"
+
+
+                          Responsáveis por:
+
+                  Direção de Desenvolvimento
+
+                          Design de Jogo
+
+                    Programação Principal
+
+                          Direção de Arte
+
+                    Design de Personagem
+
+                        Arte de Animação 
+
+
+                  Igor Emanuel Oliveira Rego
+
+                  Mickael de Albuquerque Silva
 
 
 
 
-                                Pedro Ricardo
-
-                    - Artista de Ambientes
-
-                    - Modelador 3D
 
 
-                              Nathan Dalbert
 
-                    - Programador de IA
 
-                    - Designer de Missões
+                Agradecimentos Especiais Para 
+                Nossos Talentosos Ajudantes:
 
+                              Pedro Ricardo
+
+
+                        Artista de Ambientes
+
+                            Nathan Dalbert 
+
+
+                             Modelador 2D
+
+                            Nathan Dalbert
+
+
+                          Programador de IA
+
+                            Nathan Dalbert 
+
+
+                          Designer de Missões
 
                             Rian de Noronha
 
-                    - Compositor de Trilha Sonora
 
-                    - Sound Designer
+                    Compositor de Trilha Sonora
+
+                            Rian de Noronha 
 
 
+                            Sound Designer
 
                             Paulo Henrique
 
-                    - Testador de Qualidade
 
-                    - Consultor de Gameplay
+                       Testador de Qualidade
 
-
-
+                            Paulo Henrique       
 
 
-                    A todos os que se aventuraram
+                        Consultor de Gameplay
 
-                    no espaço profundo,
+                             Paulo Henrique
 
-              exploraram galáxias distantes e
 
-                   combateram desafios
 
-              inimagináveis,dizemos com gratidão:
+                A todos os que se aventuraram 
+
+                        no espaço profundo,
+
+                exploraram galáxias distantes 
+
+                      e combateram desafios
+
+            inimagináveis,dizemos com gratidão:
 
 
                          "Missão Cumprida."
@@ -124,7 +132,7 @@ credito = """
 
                  Sem vocês, "SPACE INVADERS"
 
-            NÃO TERIA SIDO POSSiVEL
+                    NÃO TERIA SIDO POSSiVEL
 
 
             E, claro, um agradecimento especial
@@ -136,25 +144,25 @@ credito = """
 
                    fazemos o que fazemos.
 
-            Esperamos que tenham desfrutado desta
+        Esperamos que tenham desfrutado desta
 
 
-               jornada épica tanto quanto nós!
-
-
-
-
-                       Até a próxima aventura!
-
-                   Equipe de Desenvolvimento de:
+              jornada épica tanto quanto nós!
 
 
 
+
+                    Até a próxima aventura!
+
+                Equipe de Desenvolvimento de:
 
 
 
 
 
-                            "SPACE INVADERS"
+
+
+
+                        "SPACE INVADERS"
 
  """

@@ -29,7 +29,7 @@ class Game:
 
         boss_sprite = Boss((300, 35))
         self.boss = pygame.sprite.GroupSingle(boss_sprite)
-        self.boss_direcao = 1
+        self.boss_direcao = 1.5
         self.life_boss = 5
         self.boss_lasers = pygame.sprite.Group()
 
@@ -75,10 +75,10 @@ class Game:
     def boss_posicao(self):
         for boss in self.boss:
             if boss.rect.right >= largura:
-                self.boss_direcao = -1
+                self.boss_direcao = -2
 
             elif boss.rect.left <= 0:
-                self.boss_direcao = 1
+                self.boss_direcao = 1.5
 
     def alien_posicao_check(self):
         all_aliens = self.aliens.sprites()
@@ -138,6 +138,8 @@ class Game:
                 if pygame.sprite.spritecollide(aliens, self.player, True):
                     self.lives = 0
                     self.som_morte.play()
+                if aliens.rect.y >= 630:
+                    self.lives = 0
 
         if self.alien_lasers:
             for laser in self.alien_lasers:
@@ -309,5 +311,6 @@ if __name__ == '__main__':
             pygame.display.flip()
             fps.tick(60)
             if linhas == 200:
-                break
+                pygame.quit()
+                sys.exit()
                 
