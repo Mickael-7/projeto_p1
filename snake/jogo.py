@@ -158,9 +158,21 @@ class Maca:
         self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
         self.retangulo = pg.Rect(self.x , self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
     def reset(self):
-        self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-        self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-        self.retangulo = pg.Rect(self.x , self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+        while True:
+    
+            self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+            self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+
+            sobreposicao = False
+            for barreira in barreiras.barreiras:
+                if barreira.colliderect(pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)):
+                    sobreposicao = True
+                    break
+
+            if not sobreposicao:
+                break
+        self.retangulo = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
+
 
     def atualizarMaçã(self):
         pg.draw.rect(jg.tela, 'red', self.retangulo)
