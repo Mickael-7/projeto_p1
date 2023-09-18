@@ -13,7 +13,7 @@ class Jogo():
         self.relogio = pg.time.Clock()
         self.esta_rodando = True
         self.janela = pg.display.set_caption('Snake Game')
-        self.imagem = pg.image.load('maca.jpg')
+        self.imagem = pg.image.load('spriteM/maca.jpg')
         self.fonte = pg.font.match_font(cs.FONTE)
         self.carregar_arquivos()
 
@@ -93,6 +93,7 @@ class Cobra:
             self.time = time_now
             return True
         return False
+        
 
     def reset(self):
         self.x, self.y = jg.largura / 2, jg.altura / 2
@@ -159,21 +160,16 @@ class Maca:
         self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
         self.retangulo = pg.Rect(self.x , self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
     def reset(self):
-        while True:
-    
-            self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-            self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
-
-            sobreposicao = False
-            for barreira in barreiras.barreiras:
-                if barreira.colliderect(pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)):
-                    sobreposicao = True
-                    break
-
-            if not sobreposicao:
-                break
+        self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+        self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
         self.retangulo = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
 
+    def maca_com_cimento(self):
+        for barreira in barreiras.barreiras:
+            if self.retangulo.colliderect(barreira):
+                self.x = int(rd.randint(cs.TAMANHO_QUADRADO, jg.largura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+                self.y = int(rd.randint(cs.TAMANHO_QUADRADO, jg.altura - cs.TAMANHO_QUADRADO) / cs.TAMANHO_QUADRADO) * cs.TAMANHO_QUADRADO
+                self.retangulo = pg.Rect(self.x, self.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO)
 
     def atualizarMaçã(self):
         pg.draw.rect(jg.tela, 'red', self.retangulo)
@@ -261,7 +257,7 @@ while True:
     pg.draw.rect(jg.tela, (42, 51, 26), cobra.cabeca)
     for quadrado in cobra.corpo:
         pg.draw.rect(jg.tela, (42, 51, 26), quadrado)
-    
+    maca.maca_com_cimento()
     if cobra.cabeca.x == maca.x and cobra.cabeca.y == maca.y:
         cobra.corpo.append(pg.Rect(quadrado.x, quadrado.y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
         maca = Maca()
