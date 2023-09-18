@@ -15,9 +15,9 @@ class Jogo():
         self.janela = pg.display.set_caption('Snake Game')
         self.imagem = pg.image.load('maca.jpg')
         self.fonte = pg.font.match_font(cs.FONTE)
-        '''self.carregar_arquivos()'''
+        self.carregar_arquivos()
 
-    ''''def carregar_arquivos(self):
+    def carregar_arquivos(self):
         diretorio_imagem = os.path.join(os.getcwd(), "imagens")
         self.diretorio_audios = os.path.join(os.getcwd(), "music")
         self.cobra_start_logo = os.path.join(diretorio_imagem, cs.COBRA_START_LOGO)
@@ -68,11 +68,11 @@ class Jogo():
                     self.esta_rodando = False
                 if event.type == pg.KEYDOWN:
                     esperando = False
-                    pg.mixer_music.stop()'''
+                    pg.mixer_music.stop()
 
 
 jg = Jogo()
-'''jg.mostrar_tela_start()'''
+jg.mostrar_tela_start()
 
 
 class Cobra:
@@ -187,14 +187,14 @@ def desenhar_pontuacao(pontuacao):
     texto = fonte.render(frase, True, (255, 255, 255))
     jg.tela.blit(texto, [255, 4])
 
-'''class Musicas():
+class Musicas():
     def __init__(self):
         self.musica_Colisao = pg.mixer.Sound("music/smw_stomp.wav")
 
     def musica_fundo(self):
         pg.mixer_music.set_volume(0.15)
         pg.mixer.music.load("music/nymzaro - Drunk on the Light.mp3")
-        pg.mixer.music.play(-1)'''
+        pg.mixer.music.play(-1)
 
 class Barreiras:
     def __init__(self, num_barreiras):
@@ -219,8 +219,8 @@ desenhoGrade()
 cobra = Cobra()
 maca = Maca()
 
-'''musicas = Musicas()
-musicas.musica_fundo()'''
+musicas = Musicas()
+musicas.musica_fundo()
 
 while True:
     jg.tela.fill((155, 186, 89))
@@ -255,7 +255,7 @@ while True:
         barreiras.barreiras.append(pg.Rect(x, y, cs.TAMANHO_QUADRADO, cs.TAMANHO_QUADRADO))
         if len(cobra.corpo) >= 5:
             cobra.delay -= 1
-        '''musicas.musica_Colisao.play()'''
+        musicas.musica_Colisao.play()
     
     desenhar_pontuacao(len(cobra.corpo) * 10 - 10)
         
