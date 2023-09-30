@@ -19,4 +19,4 @@ Os três arquivos foram transformados em um executável que foi disponibilizado 
 + Python 3.10 (ou superior) instalado
 + IDE de preferência (o pygame é recomendado por facilitar o uso dos sons e imagens dos jogos)
 + As bibliotecas Pygame, Tkinter, os, sys e subprocess
-+ Além de todos os arquivos usados nos códigos (músicas, sons, sprites e imagens)
++ Além de todos os arquivos usados nos códigos (músicas, sons, sprites e imagens).
